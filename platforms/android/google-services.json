@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "614972861621",
+    "firebase_url": "https://smartoffers-4c859.firebaseio.com",
+    "project_id": "smartoffers-4c859",
+    "storage_bucket": "smartoffers-4c859.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:614972861621:android:a8d9527813810799",
+        "android_client_info": {
+          "package_name": "io.ionic.conferenceapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "614972861621-gq9nc1902ue1pcr8s6f77qkk52srkj1f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgv2zdmma4B6VbgZiHIVatmCz0we4i2uE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
