@@ -1,6 +1,8 @@
-# Ionic Conference Application
+﻿# Ionic Conference Application
 
 This is purely a demo of Ionic with TypeScript. It is still in development.
+
+play-services-location:11.0.1 In all the plugins
 
 
 ## Important!
