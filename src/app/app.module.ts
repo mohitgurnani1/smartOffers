@@ -78,7 +78,7 @@ import { PushNotificationProvider } from '../providers/push-notification/push-no
         { component: SignupPage, name: 'SignupPage', segment: 'signup' },
         { component: PushNotificationPage, name: 'PushNotificationPage', segment: 'pushNotification' },
         {component:OfferPage, name:'Offer',segment:'offer'},
-        { component: HomePage, name: 'SpeakerList', segment: 'speakerList' },
+        { component: HomePage, name: 'OfferList', segment: 'offerList' },
         { component: TrackingPage, name: 'TrackingPage', segment: 'tracking' }
       ]
     }),
