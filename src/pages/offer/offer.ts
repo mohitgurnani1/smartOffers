@@ -12,14 +12,14 @@ import { ConferenceData } from '../../providers/conference-data';
 import { UserData } from '../../providers/user-data';
 
 import { SessionDetailPage } from '../session-detail/session-detail';
-import { ScheduleFilterPage } from '../schedule-filter/schedule-filter';
+import { AppFilterPage } from '../app-filter/app-filter';
 
 
 @Component({
   selector: 'page-schedule',
-  templateUrl: 'schedule.html'
+  templateUrl: 'offer.html'
 })
-export class SchedulePage {
+export class OfferPage {
   // the list is a child of the schedule page
   // @ViewChild('scheduleList') gets a reference to the list
   // with the variable #scheduleList, `read: List` tells it to return
@@ -61,7 +61,7 @@ export class SchedulePage {
   }
 
   presentFilter() {
-    let modal = this.modalCtrl.create(ScheduleFilterPage, this.excludeTracks);
+    let modal = this.modalCtrl.create(AppFilterPage, this.excludeTracks);
     modal.present();
 
     modal.onWillDismiss((data: any[]) => {

@@ -40,11 +40,11 @@ export class ConferenceData {
           session.speakers = [];
           if (session.speakerNames) {
             session.speakerNames.forEach((speakerName: any) => {
-              let speaker = this.data.speakers.find((s: any) => s.name === speakerName);
-              if (speaker) {
-                session.speakers.push(speaker);
-                speaker.sessions = speaker.sessions || [];
-                speaker.sessions.push(session);
+              let offer = this.data.offers.find((s: any) => s.name === speakerName);
+              if (offer) {
+                session.offers.push(offer);
+                offer.sessions = offer.sessions || [];
+                offer.sessions.push(session);
               }
             });
           }
@@ -130,9 +130,9 @@ export class ConferenceData {
     session.hide = !(matchesQueryText && matchesTracks && matchesSegment);
   }
 
-  getSpeakers() {
+  getOffers() {
     return this.load().map((data: any) => {
-      return data.speakers.sort((a: any, b: any) => {
+      return data.offers.sort((a: any, b: any) => {
         let aName = a.name.split(' ').pop();
         let bName = b.name.split(' ').pop();
         return aName.localeCompare(bName);

@@ -3,9 +3,8 @@
     <ion-buttons start>
       <button ion-button (click)="dismiss()">Cancel</button>
     </ion-buttons>
-
     <ion-title>
-      Filter Sessions
+      Quick Settings
     </ion-title>
 
     <ion-buttons end>
@@ -15,9 +14,8 @@
 </ion-header>
 
 <ion-content class="outer-content">
-
   <ion-list>
-    <ion-list-header>Tracks</ion-list-header>
+    <ion-list-header>Options</ion-list-header>
 
     <ion-item *ngFor="let track of tracks" [attr.track]="track.name | lowercase">
       <span item-start class="dot"></span>
@@ -26,11 +24,4 @@
     </ion-item>
 
   </ion-list>
-
-  <ion-list>
-    <button ion-item (click)="resetFilters()" detail-none class="reset-filters">
-      Reset All Filters
-    </button>
-  </ion-list>
-
 </ion-content>

@@ -1,0 +1,59 @@
+<ion-header>
+  <ion-navbar no-border-bottom>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+
+    <ion-segment [(ngModel)]="segment" (ionChange)="update()">
+      <ion-segment-button value="all">
+        All
+      </ion-segment-button>
+      <ion-segment-button value="favorites">
+        Offers For You
+      </ion-segment-button>
+    </ion-segment>
+
+    <ion-buttons end>
+      <button ion-button icon-only (click)="presentToggles()">
+        <ion-icon ios="ios-options-outline" md="md-options"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+
+<!--  <ion-toolbar no-border-top>
+    <ion-searchbar color="primary"
+                   [(ngModel)]="queryText"
+                   (ionInput)="update()"
+                   placeholder="Search">
+    </ion-searchbar>
+  </ion-toolbar>-->
+</ion-header>
+
+<ion-content class="outer-content offer-list">
+
+  <ion-list [virtualScroll]="offers">
+    <ion-grid fixed>
+      <ion-row align-items-stretch>
+        <ion-col col-12 col-md-6 align-self-stretch align-self-center *virtualItem="let offer" approxItemHeight="457px">
+          <ion-card class="offer-card">
+            <ion-card-header>
+              <button ion-item detail-none (click)="goToSpeakerDetail(offer)">
+                {{offer.name}}
+              </button>
+            </ion-card-header>
+            <ion-card-content class="outer-content">
+              <ion-list>
+                <button ion-item *ngFor="let session of offer.sessions" (click)="goToSessionDetail(session)">
+                  <h3>{{session.name}}</h3>
+                </button>
+                <button ion-item (click)="goToSpeakerDetail(offer)">
+                  <h3>About {{offer.name}}</h3>
+                </button>
+              </ion-list>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-list>
+</ion-content>

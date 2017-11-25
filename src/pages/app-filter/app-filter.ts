@@ -6,10 +6,10 @@ import { ConferenceData } from '../../providers/conference-data';
 
 
 @Component({
-  selector: 'page-schedule-filter',
-  templateUrl: 'schedule-filter.html'
+  selector: 'page-app-filter',
+  templateUrl: 'app-filter.html'
 })
-export class ScheduleFilterPage {
+export class AppFilterPage {
   tracks: Array<{name: string, isChecked: boolean}> = [];
 
   constructor(
@@ -29,13 +29,6 @@ export class ScheduleFilterPage {
         });
       });
 
-    });
-  }
-
-  resetFilters() {
-    // reset all of the toggles to be checked
-    this.tracks.forEach(track => {
-      track.isChecked = true;
     });
   }
 
