@@ -25,6 +25,7 @@ import { SpeakerListPage } from '../pages/speaker-list/speaker-list';
 import { TabsPage } from '../pages/tabs-page/tabs-page';
 import { TutorialPage } from '../pages/tutorial/tutorial';
 import { SupportPage } from '../pages/support/support';
+import { PushNotificationPage } from '../pages/push-notification/push-notification';
 
 import { ConferenceData } from '../providers/conference-data';
 import { UserData } from '../providers/user-data';
@@ -34,6 +35,8 @@ import { Geolocation } from '@ionic-native/geolocation';
 import { Push } from '@ionic-native/push';
 import { RestapiServiceProvider } from '../providers/restapi-service';
 import { BackgroundMode } from '@ionic-native/background-mode';
+import { PushNotificationProvider } from '../providers/push-notification/push-notification';
+
 
 
 @NgModule({
@@ -52,7 +55,8 @@ import { BackgroundMode } from '@ionic-native/background-mode';
     SpeakerListPage,
     TabsPage,
     TutorialPage,
-    SupportPage
+    SupportPage,
+    PushNotificationPage
   ],
   imports: [
     BrowserModule,
@@ -71,7 +75,8 @@ import { BackgroundMode } from '@ionic-native/background-mode';
         { component: SupportPage, name: 'SupportPage', segment: 'support' },
         { component: LoginPage, name: 'LoginPage', segment: 'login' },
         { component: AccountPage, name: 'AccountPage', segment: 'account' },
-        { component: SignupPage, name: 'SignupPage', segment: 'signup' }
+        { component: SignupPage, name: 'SignupPage', segment: 'signup' },
+        { component: PushNotificationPage, name: 'PushNotificationPage', segment: 'pushNotification' }
       ]
     }),
     IonicStorageModule.forRoot()
@@ -92,7 +97,8 @@ import { BackgroundMode } from '@ionic-native/background-mode';
     SpeakerListPage,
     TabsPage,
     TutorialPage,
-    SupportPage
+    SupportPage,
+    PushNotificationPage
   ],
   providers: [
     { provide: ErrorHandler, useClass: IonicErrorHandler },
@@ -105,7 +111,10 @@ import { BackgroundMode } from '@ionic-native/background-mode';
     Geolocation,
     Push,
     RestapiServiceProvider,
-    BackgroundMode
+    BackgroundMode,
+    PushNotificationProvider,
+    
+    
   ]
 })
 export class AppModule { }

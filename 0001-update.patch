@@ -1,0 +1,443 @@
+From 345f92cbc7da09ace56e3ee8ea5dd689693d0e33 Mon Sep 17 00:00:00 2001
+From: saurabh19 <code.saurabh19@gmail.com>
+Date: Thu, 23 Nov 2017 17:42:41 +0530
+Subject: [PATCH] update
+
+---
+ src/app/app.component.ts             | 12 ++++----
+ src/app/app.module.ts                | 28 +++++++++--------
+ src/pages/about/about.html           |  2 +-
+ src/pages/app-filter/app-filter.html | 13 ++------
+ src/pages/app-filter/app-filter.ts   |  7 -----
+ src/pages/apply/apply.html           | 32 +++----------------
+ src/pages/ar/ar.html                 | 32 +++----------------
+ src/pages/ar/ar.ts                   | 60 +++++-------------------------------
+ src/pages/home/home.ts               |  1 +
+ src/pages/tabs-page/tabs-page.html   |  6 ++--
+ src/pages/tabs-page/tabs-page.ts     | 14 ++++++---
+ 11 files changed, 55 insertions(+), 152 deletions(-)
+
+diff --git a/src/app/app.component.ts b/src/app/app.component.ts
+index 1098c51..b32cdb9 100644
+--- a/src/app/app.component.ts
++++ b/src/app/app.component.ts
+@@ -11,13 +11,13 @@ import { LoginPage } from '../pages/login/login';
+ import { MapPage } from '../pages/map/map';
+ import { SignupPage } from '../pages/signup/signup';
+ import { TabsPage } from '../pages/tabs-page/tabs-page';
+-import { SchedulePage } from '../pages/schedule/schedule';
+-import { SpeakerListPage } from '../pages/speaker-list/speaker-list';
++import { HomePage } from '../pages/home/home';
+ import { ApplyPage } from '../pages/apply/apply';
+ 
+ import { ConferenceData } from '../providers/conference-data';
+ import { UserData } from '../providers/user-data';
+-import {ARPage} from "../pages/AR/ar";
++import {ARPage} from "../pages/ar/ar";
++import {TrackingPage} from "../pages/tracking/tracking";
+ 
+ export interface PageInterface {
+   title: string;
+@@ -42,11 +42,11 @@ export class ConferenceApp {
+   // the left menu only works after login
+   // the login page disables the left menu
+   appPages: PageInterface[] = [
+-    { title: 'Speakers', name: 'TabsPage', component: TabsPage, tabComponent: SpeakerListPage, index: 0, icon: 'home' },
++    { title: 'Home', name: 'TabsPage', component: TabsPage, tabComponent: HomePage, index: 0, icon: 'home' },
+     { title: 'Map', name: 'TabsPage', component: TabsPage, tabComponent: MapPage, index: 1, icon: 'map' },
+     { title: 'AR', name: 'TabsPage', component: TabsPage, tabComponent: ARPage, index: 2, icon: 'camera' },
+-    { title: 'Schedule', name: 'TabsPage', component: TabsPage, tabComponent: SchedulePage, index: 3, icon: 'calendar' },
+-    { title: 'Apply', name: 'TabsPage', component: TabsPage, tabComponent: ApplyPage, index: 4, icon: 'person-add' },
++    { title: 'Apply', name: 'TabsPage', component: TabsPage, tabComponent: ApplyPage, index: 3, icon: 'person-add' },
++    { title: 'Tracking', name: 'TabsPage', component: TabsPage, tabComponent: TrackingPage, index: 4, icon: 'map' },
+   ];
+   loggedInPages: PageInterface[] = [
+     { title: 'Account', name: 'AccountPage', component: AccountPage, icon: 'person' },
+diff --git a/src/app/app.module.ts b/src/app/app.module.ts
+index 6de98b9..280e91b 100644
+--- a/src/app/app.module.ts
++++ b/src/app/app.module.ts
+@@ -16,18 +16,19 @@ import { PopoverPage } from '../pages/about-popover/about-popover';
+ import { AccountPage } from '../pages/account/account';
+ import { LoginPage } from '../pages/login/login';
+ import { MapPage } from '../pages/map/map';
+-import { SchedulePage } from '../pages/schedule/schedule';
++import { OfferPage } from '../pages/offer/offer';
+ import { AppFilterPage } from '../pages/app-filter/app-filter';
+ import { SessionDetailPage } from '../pages/session-detail/session-detail';
+ import { SignupPage } from '../pages/signup/signup';
+ import { SpeakerDetailPage } from '../pages/speaker-detail/speaker-detail';
+-import { SpeakerListPage } from '../pages/speaker-list/speaker-list';
++import { HomePage } from '../pages/home/home';
+ import { TabsPage } from '../pages/tabs-page/tabs-page';
+ import { ApplyPage } from '../pages/apply/apply';
+-import {ARPage} from "../pages/AR/ar";
++import {ARPage} from "../pages/ar/ar";
+ 
+ import { ConferenceData } from '../providers/conference-data';
+ import { UserData } from '../providers/user-data';
++import {TrackingPage} from "../pages/tracking/tracking";
+ 
+ 
+ @NgModule({
+@@ -38,15 +39,16 @@ import { UserData } from '../providers/user-data';
+     LoginPage,
+     MapPage,
+     PopoverPage,
+-    SchedulePage,
++    OfferPage,
+     AppFilterPage,
+     SessionDetailPage,
+     SignupPage,
+     SpeakerDetailPage,
+-    SpeakerListPage,
++    HomePage,
+     TabsPage,
+     ApplyPage,
+-    ARPage
++    ARPage,
++    TrackingPage
+   ],
+   imports: [
+     BrowserModule,
+@@ -54,10 +56,10 @@ import { UserData } from '../providers/user-data';
+     IonicModule.forRoot(ConferenceApp, {}, {
+       links: [
+         { component: TabsPage, name: 'TabsPage', segment: 'tabs-page' },
+-        { component: SchedulePage, name: 'Schedule', segment: 'schedule' },
++        { component: OfferPage, name: 'Offer', segment: 'offer' },
+         { component: SessionDetailPage, name: 'SessionDetail', segment: 'sessionDetail/:sessionId' },
+         { component: AppFilterPage, name: 'ScheduleFilter', segment: 'scheduleFilter' },
+-        { component: SpeakerListPage, name: 'SpeakerList', segment: 'speakerList' },
++        { component: HomePage, name: 'SpeakerList', segment: 'speakerList' },
+         { component: SpeakerDetailPage, name: 'SpeakerDetail', segment: 'speakerDetail/:speakerId' },
+         { component: MapPage, name: 'Map', segment: 'map' },
+         { component: AboutPage, name: 'About', segment: 'about' },
+@@ -65,7 +67,8 @@ import { UserData } from '../providers/user-data';
+         { component: ARPage, name: 'ARPage', segment: 'ar' },
+         { component: LoginPage, name: 'LoginPage', segment: 'login' },
+         { component: AccountPage, name: 'AccountPage', segment: 'account' },
+-        { component: SignupPage, name: 'SignupPage', segment: 'signup' }
++        { component: SignupPage, name: 'SignupPage', segment: 'signup' },
++        { component: TrackingPage, name: 'TrackingPage', segment: 'tracking' }
+       ]
+     }),
+     IonicStorageModule.forRoot()
+@@ -78,15 +81,16 @@ import { UserData } from '../providers/user-data';
+     LoginPage,
+     MapPage,
+     PopoverPage,
+-    SchedulePage,
++    OfferPage,
+     AppFilterPage,
+     SessionDetailPage,
+     SignupPage,
+     SpeakerDetailPage,
+-    SpeakerListPage,
++    HomePage,
+     TabsPage,
+     ApplyPage,
+-    ARPage
++    ARPage,
++    TrackingPage
+   ],
+   providers: [
+     { provide: ErrorHandler, useClass: IonicErrorHandler },
+diff --git a/src/pages/about/about.html b/src/pages/about/about.html
+index c1920cc..7d70f98 100644
+--- a/src/pages/about/about.html
++++ b/src/pages/about/about.html
+@@ -14,7 +14,7 @@
+ 
+ <ion-content>
+   <div class="about-header">
+-    <img src="assets/img/ionic-logo-white.svg" alt="ionic logo">
++    <img src="assets/img/smart-offers.svg" alt="ionic logo">
+   </div>
+   <div padding class="about-info">
+     <h4>Smart Offers</h4>
+diff --git a/src/pages/app-filter/app-filter.html b/src/pages/app-filter/app-filter.html
+index 6eecfa1..5c4b1e3 100644
+--- a/src/pages/app-filter/app-filter.html
++++ b/src/pages/app-filter/app-filter.html
+@@ -3,9 +3,8 @@
+     <ion-buttons start>
+       <button ion-button (click)="dismiss()">Cancel</button>
+     </ion-buttons>
+-
+     <ion-title>
+-      Filter Sessions
++      Quick Settings
+     </ion-title>
+ 
+     <ion-buttons end>
+@@ -15,9 +14,8 @@
+ </ion-header>
+ 
+ <ion-content class="outer-content">
+-
+   <ion-list>
+-    <ion-list-header>Tracks</ion-list-header>
++    <ion-list-header>Options</ion-list-header>
+ 
+     <ion-item *ngFor="let track of tracks" [attr.track]="track.name | lowercase">
+       <span item-start class="dot"></span>
+@@ -26,11 +24,4 @@
+     </ion-item>
+ 
+   </ion-list>
+-
+-  <ion-list>
+-    <button ion-item (click)="resetFilters()" detail-none class="reset-filters">
+-      Reset All Filters
+-    </button>
+-  </ion-list>
+-
+ </ion-content>
+diff --git a/src/pages/app-filter/app-filter.ts b/src/pages/app-filter/app-filter.ts
+index f6c4977..8009e81 100644
+--- a/src/pages/app-filter/app-filter.ts
++++ b/src/pages/app-filter/app-filter.ts
+@@ -32,13 +32,6 @@ export class AppFilterPage {
+     });
+   }
+ 
+-  resetFilters() {
+-    // reset all of the toggles to be checked
+-    this.tracks.forEach(track => {
+-      track.isChecked = true;
+-    });
+-  }
+-
+   applyFilters() {
+     // Pass back a new array of track names to exclude
+     let excludedTrackNames = this.tracks.filter(c => !c.isChecked).map(c => c.name);
+diff --git a/src/pages/apply/apply.html b/src/pages/apply/apply.html
+index 91dced3..8d49f11 100644
+--- a/src/pages/apply/apply.html
++++ b/src/pages/apply/apply.html
+@@ -1,34 +1,12 @@
+ <ion-header>
+-
+-	<ion-navbar>
+-		<button ion-button menuToggle>
++  <ion-navbar>
++    <button ion-button menuToggle>
+       <ion-icon name="menu"></ion-icon>
+     </button>
+-		<ion-title>Support</ion-title>
+-	</ion-navbar>
+-
++    <ion-title>Apply</ion-title>
++  </ion-navbar>
+ </ion-header>
+ 
++<ion-content padding>
+ 
+-<ion-content>
+-	<div class="logo">
+-		<img src="assets/img/appicon.svg" alt="Ionic Logo">
+-	</div>
+-
+-	<form #submitForm="ngForm" novalidate (ngSubmit)="submit(submitForm)">
+-		<ion-list no-lines>
+-			<ion-item>
+-				<ion-label stacked color="primary">Enter your support message below</ion-label>
+-				<ion-textarea [(ngModel)]="supportMessage" name="supportQuestion" #supportQuestion="ngModel" rows="6" required></ion-textarea>
+-			</ion-item>
+-		</ion-list>
+-
+-		<p ion-text [hidden]="supportQuestion.valid || submitted === false" color="danger" padding-left>
+-			Support message is required
+-		</p>
+-
+-		<div padding>
+-			<button ion-button block type="submit">Submit</button>
+-		</div>
+-	</form>
+ </ion-content>
+diff --git a/src/pages/ar/ar.html b/src/pages/ar/ar.html
+index 91dced3..ce029a4 100644
+--- a/src/pages/ar/ar.html
++++ b/src/pages/ar/ar.html
+@@ -1,34 +1,12 @@
+ <ion-header>
+-
+-	<ion-navbar>
+-		<button ion-button menuToggle>
++  <ion-navbar>
++    <button ion-button menuToggle>
+       <ion-icon name="menu"></ion-icon>
+     </button>
+-		<ion-title>Support</ion-title>
+-	</ion-navbar>
+-
++    <ion-title>Augmented Reality</ion-title>
++  </ion-navbar>
+ </ion-header>
+ 
++<ion-content padding>
+ 
+-<ion-content>
+-	<div class="logo">
+-		<img src="assets/img/appicon.svg" alt="Ionic Logo">
+-	</div>
+-
+-	<form #submitForm="ngForm" novalidate (ngSubmit)="submit(submitForm)">
+-		<ion-list no-lines>
+-			<ion-item>
+-				<ion-label stacked color="primary">Enter your support message below</ion-label>
+-				<ion-textarea [(ngModel)]="supportMessage" name="supportQuestion" #supportQuestion="ngModel" rows="6" required></ion-textarea>
+-			</ion-item>
+-		</ion-list>
+-
+-		<p ion-text [hidden]="supportQuestion.valid || submitted === false" color="danger" padding-left>
+-			Support message is required
+-		</p>
+-
+-		<div padding>
+-			<button ion-button block type="submit">Submit</button>
+-		</div>
+-	</form>
+ </ion-content>
+diff --git a/src/pages/ar/ar.ts b/src/pages/ar/ar.ts
+index 3699950..db1577f 100644
+--- a/src/pages/ar/ar.ts
++++ b/src/pages/ar/ar.ts
+@@ -1,66 +1,20 @@
+ import { Component } from '@angular/core';
+-import { NgForm } from '@angular/forms';
+ 
+-import { AlertController, NavController, ToastController } from 'ionic-angular';
++import {IonicPage, NavController, NavParams} from 'ionic-angular';
+ 
+ 
++@IonicPage()
+ @Component({
+-  selector: 'page-user',
+-  templateUrl: 'ar.html'
++  selector: 'page-tracking',
++  templateUrl: 'ar.html',
+ })
+ export class ARPage {
+ 
+-  submitted: boolean = false;
+-  supportMessage: string;
+-
+-  constructor(
+-    public navCtrl: NavController,
+-    public alertCtrl: AlertController,
+-    public toastCtrl: ToastController
+-  ) {
+-
++  constructor(public navCtrl: NavController, public navParams: NavParams) {
+   }
+ 
+-  ionViewDidEnter() {
+-    let toast = this.toastCtrl.create({
+-      message: 'This does not actually send a support request.',
+-      duration: 3000
+-    });
+-    toast.present();
++  ionViewDidLoad() {
++    console.log('ionViewDidLoad TrackingPage');
+   }
+ 
+-  submit(form: NgForm) {
+-    this.submitted = true;
+-
+-    if (form.valid) {
+-      this.supportMessage = '';
+-      this.submitted = false;
+-
+-      let toast = this.toastCtrl.create({
+-        message: 'Your support request has been sent.',
+-        duration: 3000
+-      });
+-      toast.present();
+-    }
+-  }
+-
+-  // If the user enters text in the support question and then navigates
+-  // without submitting first, ask if they meant to leave the page
+-  ionViewCanLeave(): boolean | Promise<boolean> {
+-    // If the support message is empty we should just navigate
+-    if (!this.supportMessage || this.supportMessage.trim().length === 0) {
+-      return true;
+-    }
+-
+-    return new Promise((resolve: any, reject: any) => {
+-      let alert = this.alertCtrl.create({
+-        title: 'Leave this page?',
+-        message: 'Are you sure you want to leave this page? Your support message will not be submitted.'
+-      });
+-      alert.addButton({ text: 'Stay', handler: reject });
+-      alert.addButton({ text: 'Leave', role: 'cancel', handler: resolve });
+-
+-      alert.present();
+-    });
+-  }
+ }
+diff --git a/src/pages/home/home.ts b/src/pages/home/home.ts
+index a9f2c3f..70e191a 100644
+--- a/src/pages/home/home.ts
++++ b/src/pages/home/home.ts
+@@ -42,6 +42,7 @@ export class HomePage {
+   ) {}
+ 
+   ionViewDidLoad() {
++    //integrate with service
+     this.confData.getSpeakers().subscribe((speakers: any[]) => {
+       this.speakers = speakers;
+     });
+diff --git a/src/pages/tabs-page/tabs-page.html b/src/pages/tabs-page/tabs-page.html
+index a683a5c..0c3f1eb 100644
+--- a/src/pages/tabs-page/tabs-page.html
++++ b/src/pages/tabs-page/tabs-page.html
+@@ -1,7 +1,7 @@
+ <ion-tabs [selectedIndex]="mySelectedIndex" name="conference">
+-  <ion-tab [root]="tab2Root" tabTitle="Speakers" tabIcon="home"></ion-tab>
++  <ion-tab [root]="tab2Root" tabTitle="Home" tabIcon="home"></ion-tab>
+   <ion-tab [root]="tab3Root" tabTitle="Map" tabIcon="map"></ion-tab>
+   <ion-tab [root]="tab4Root" tabTitle="AR" tabIcon="camera"></ion-tab>
+-  <ion-tab [root]="tab1Root" tabTitle="Schedule" tabIcon="calendar" tabUrlPath="conference-schedule"></ion-tab>
+-  <ion-tab [root]="tab4Root" tabTitle="Apply" tabIcon="person-add"></ion-tab>
++  <ion-tab [root]="tab5Root" tabTitle="Apply" tabIcon="person-add"></ion-tab>
++  <ion-tab [root]="tab6Root" tabTitle="Tracking" tabIcon="map"></ion-tab>
+ </ion-tabs>
+diff --git a/src/pages/tabs-page/tabs-page.ts b/src/pages/tabs-page/tabs-page.ts
+index ee321a3..8b63ee1 100644
+--- a/src/pages/tabs-page/tabs-page.ts
++++ b/src/pages/tabs-page/tabs-page.ts
+@@ -3,19 +3,23 @@ import { Component } from '@angular/core';
+ import { NavParams } from 'ionic-angular';
+ 
+ import { MapPage } from '../map/map';
+-import { SchedulePage } from '../schedule/schedule';
+-import { SpeakerListPage } from '../speaker-list/speaker-list';
++import { OfferPage } from '../offer/offer';
++import { HomePage } from '../home/home';
+ import {ApplyPage} from "../apply/apply";
++import {ARPage} from "../ar/ar";
++import {TrackingPage} from "../tracking/tracking";
+ 
+ @Component({
+   templateUrl: 'tabs-page.html'
+ })
+ export class TabsPage {
+   // set the root pages for each tab
+-  tab1Root: any = SchedulePage;
+-  tab2Root: any = SpeakerListPage;
++  tab1Root: any = OfferPage;
++  tab2Root: any = HomePage;
+   tab3Root: any = MapPage;
+-  tab4Root: any = ApplyPage;
++  tab4Root: any = ARPage;
++  tab5Root: any = ApplyPage;
++  tab6Root: any = TrackingPage;
+   mySelectedIndex: number;
+ 
+   constructor(navParams: NavParams) {
+-- 
+2.15.0.windows.1
+

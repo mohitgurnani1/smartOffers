@@ -1,0 +1,739 @@
+From d91c8df0969aa4c3862870d440419b501ce2b9c2 Mon Sep 17 00:00:00 2001
+From: saurabh19 <code.saurabh19@gmail.com>
+Date: Wed, 22 Nov 2017 11:22:16 +0530
+Subject: [PATCH] UI changes sidebar
+
+---
+ package.json                                       |  2 +-
+ src/app/app.component.ts                           | 31 ++++------
+ src/app/app.module.ts                              | 24 ++++----
+ src/app/app.template.html                          |  8 +--
+ src/pages/{support/support.html => AR/ar.html}     |  0
+ src/pages/{support/support.scss => AR/ar.scss}     |  0
+ src/pages/{support/support.ts => AR/ar.ts}         |  4 +-
+ src/pages/about-popover/about-popover.ts           |  4 +-
+ src/pages/about/about.html                         | 32 ++---------
+ src/pages/account/account.ts                       |  2 +-
+ .../app-filter.html}                               |  0
+ src/pages/app-filter/app-filter.scss               | 17 ++++++
+ .../app-filter.ts}                                 |  6 +-
+ src/pages/apply/apply.html                         | 34 +++++++++++
+ src/pages/apply/apply.scss                         |  0
+ src/pages/apply/apply.ts                           | 66 ++++++++++++++++++++++
+ src/pages/schedule-filter/schedule-filter.scss     | 17 ------
+ src/pages/schedule/schedule.ts                     |  4 +-
+ src/pages/tabs-page/tabs-page.html                 |  7 ++-
+ src/pages/tabs-page/tabs-page.ts                   |  4 +-
+ src/pages/tutorial/tutorial.html                   | 44 ---------------
+ src/pages/tutorial/tutorial.scss                   | 37 ------------
+ src/pages/tutorial/tutorial.ts                     | 49 ----------------
+ 23 files changed, 164 insertions(+), 228 deletions(-)
+ rename src/pages/{support/support.html => AR/ar.html} (100%)
+ rename src/pages/{support/support.scss => AR/ar.scss} (100%)
+ rename src/pages/{support/support.ts => AR/ar.ts} (96%)
+ rename src/pages/{schedule-filter/schedule-filter.html => app-filter/app-filter.html} (100%)
+ create mode 100644 src/pages/app-filter/app-filter.scss
+ rename src/pages/{schedule-filter/schedule-filter.ts => app-filter/app-filter.ts} (92%)
+ create mode 100644 src/pages/apply/apply.html
+ create mode 100644 src/pages/apply/apply.scss
+ create mode 100644 src/pages/apply/apply.ts
+ delete mode 100644 src/pages/schedule-filter/schedule-filter.scss
+ delete mode 100644 src/pages/tutorial/tutorial.html
+ delete mode 100644 src/pages/tutorial/tutorial.scss
+ delete mode 100644 src/pages/tutorial/tutorial.ts
+
+diff --git a/package.json b/package.json
+index 7b7cd00..dd57012 100644
+--- a/package.json
++++ b/package.json
+@@ -75,4 +75,4 @@
+       "cordova-plugin-ionic-keyboard": {}
+     }
+   }
+-}
++}
+\ No newline at end of file
+diff --git a/src/app/app.component.ts b/src/app/app.component.ts
+index e36a02f..1098c51 100644
+--- a/src/app/app.component.ts
++++ b/src/app/app.component.ts
+@@ -11,13 +11,13 @@ import { LoginPage } from '../pages/login/login';
+ import { MapPage } from '../pages/map/map';
+ import { SignupPage } from '../pages/signup/signup';
+ import { TabsPage } from '../pages/tabs-page/tabs-page';
+-import { TutorialPage } from '../pages/tutorial/tutorial';
+ import { SchedulePage } from '../pages/schedule/schedule';
+ import { SpeakerListPage } from '../pages/speaker-list/speaker-list';
+-import { SupportPage } from '../pages/support/support';
++import { ApplyPage } from '../pages/apply/apply';
+ 
+ import { ConferenceData } from '../providers/conference-data';
+ import { UserData } from '../providers/user-data';
++import {ARPage} from "../pages/AR/ar";
+ 
+ export interface PageInterface {
+   title: string;
+@@ -42,19 +42,18 @@ export class ConferenceApp {
+   // the left menu only works after login
+   // the login page disables the left menu
+   appPages: PageInterface[] = [
+-    { title: 'Schedule', name: 'TabsPage', component: TabsPage, tabComponent: SchedulePage, index: 0, icon: 'calendar' },
+-    { title: 'Speakers', name: 'TabsPage', component: TabsPage, tabComponent: SpeakerListPage, index: 1, icon: 'contacts' },
+-    { title: 'Map', name: 'TabsPage', component: TabsPage, tabComponent: MapPage, index: 2, icon: 'map' },
+-    { title: 'About', name: 'TabsPage', component: TabsPage, tabComponent: AboutPage, index: 3, icon: 'information-circle' }
++    { title: 'Speakers', name: 'TabsPage', component: TabsPage, tabComponent: SpeakerListPage, index: 0, icon: 'home' },
++    { title: 'Map', name: 'TabsPage', component: TabsPage, tabComponent: MapPage, index: 1, icon: 'map' },
++    { title: 'AR', name: 'TabsPage', component: TabsPage, tabComponent: ARPage, index: 2, icon: 'camera' },
++    { title: 'Schedule', name: 'TabsPage', component: TabsPage, tabComponent: SchedulePage, index: 3, icon: 'calendar' },
++    { title: 'Apply', name: 'TabsPage', component: TabsPage, tabComponent: ApplyPage, index: 4, icon: 'person-add' },
+   ];
+   loggedInPages: PageInterface[] = [
+     { title: 'Account', name: 'AccountPage', component: AccountPage, icon: 'person' },
+-    { title: 'Support', name: 'SupportPage', component: SupportPage, icon: 'help' },
+     { title: 'Logout', name: 'TabsPage', component: TabsPage, icon: 'log-out', logsOut: true }
+   ];
+   loggedOutPages: PageInterface[] = [
+     { title: 'Login', name: 'LoginPage', component: LoginPage, icon: 'log-in' },
+-    { title: 'Support', name: 'SupportPage', component: SupportPage, icon: 'help' },
+     { title: 'Signup', name: 'SignupPage', component: SignupPage, icon: 'person-add' }
+   ];
+   rootPage: any;
+@@ -68,18 +67,8 @@ export class ConferenceApp {
+     public storage: Storage,
+     public splashScreen: SplashScreen
+   ) {
+-
+-    // Check if the user has already seen the tutorial
+-    this.storage.get('hasSeenTutorial')
+-      .then((hasSeenTutorial) => {
+-        if (hasSeenTutorial) {
+-          this.rootPage = TabsPage;
+-        } else {
+-          this.rootPage = TutorialPage;
+-        }
+-        this.platformReady()
+-      });
+-
++    this.rootPage = TabsPage;
++    this.platformReady();
+     // load the conference data
+     confData.load();
+ 
+@@ -121,7 +110,7 @@ export class ConferenceApp {
+   }
+ 
+   openTutorial() {
+-    this.nav.setRoot(TutorialPage);
++    this.nav.setRoot(AboutPage);
+   }
+ 
+   listenToLoginEvents() {
+diff --git a/src/app/app.module.ts b/src/app/app.module.ts
+index 5efb6e8..6de98b9 100644
+--- a/src/app/app.module.ts
++++ b/src/app/app.module.ts
+@@ -17,14 +17,14 @@ import { AccountPage } from '../pages/account/account';
+ import { LoginPage } from '../pages/login/login';
+ import { MapPage } from '../pages/map/map';
+ import { SchedulePage } from '../pages/schedule/schedule';
+-import { ScheduleFilterPage } from '../pages/schedule-filter/schedule-filter';
++import { AppFilterPage } from '../pages/app-filter/app-filter';
+ import { SessionDetailPage } from '../pages/session-detail/session-detail';
+ import { SignupPage } from '../pages/signup/signup';
+ import { SpeakerDetailPage } from '../pages/speaker-detail/speaker-detail';
+ import { SpeakerListPage } from '../pages/speaker-list/speaker-list';
+ import { TabsPage } from '../pages/tabs-page/tabs-page';
+-import { TutorialPage } from '../pages/tutorial/tutorial';
+-import { SupportPage } from '../pages/support/support';
++import { ApplyPage } from '../pages/apply/apply';
++import {ARPage} from "../pages/AR/ar";
+ 
+ import { ConferenceData } from '../providers/conference-data';
+ import { UserData } from '../providers/user-data';
+@@ -39,14 +39,14 @@ import { UserData } from '../providers/user-data';
+     MapPage,
+     PopoverPage,
+     SchedulePage,
+-    ScheduleFilterPage,
++    AppFilterPage,
+     SessionDetailPage,
+     SignupPage,
+     SpeakerDetailPage,
+     SpeakerListPage,
+     TabsPage,
+-    TutorialPage,
+-    SupportPage
++    ApplyPage,
++    ARPage
+   ],
+   imports: [
+     BrowserModule,
+@@ -56,13 +56,13 @@ import { UserData } from '../providers/user-data';
+         { component: TabsPage, name: 'TabsPage', segment: 'tabs-page' },
+         { component: SchedulePage, name: 'Schedule', segment: 'schedule' },
+         { component: SessionDetailPage, name: 'SessionDetail', segment: 'sessionDetail/:sessionId' },
+-        { component: ScheduleFilterPage, name: 'ScheduleFilter', segment: 'scheduleFilter' },
++        { component: AppFilterPage, name: 'ScheduleFilter', segment: 'scheduleFilter' },
+         { component: SpeakerListPage, name: 'SpeakerList', segment: 'speakerList' },
+         { component: SpeakerDetailPage, name: 'SpeakerDetail', segment: 'speakerDetail/:speakerId' },
+         { component: MapPage, name: 'Map', segment: 'map' },
+         { component: AboutPage, name: 'About', segment: 'about' },
+-        { component: TutorialPage, name: 'Tutorial', segment: 'tutorial' },
+-        { component: SupportPage, name: 'SupportPage', segment: 'support' },
++        { component: ApplyPage, name: 'ApplyPage', segment: 'apply' },
++        { component: ARPage, name: 'ARPage', segment: 'ar' },
+         { component: LoginPage, name: 'LoginPage', segment: 'login' },
+         { component: AccountPage, name: 'AccountPage', segment: 'account' },
+         { component: SignupPage, name: 'SignupPage', segment: 'signup' }
+@@ -79,14 +79,14 @@ import { UserData } from '../providers/user-data';
+     MapPage,
+     PopoverPage,
+     SchedulePage,
+-    ScheduleFilterPage,
++    AppFilterPage,
+     SessionDetailPage,
+     SignupPage,
+     SpeakerDetailPage,
+     SpeakerListPage,
+     TabsPage,
+-    TutorialPage,
+-    SupportPage
++    ApplyPage,
++    ARPage
+   ],
+   providers: [
+     { provide: ErrorHandler, useClass: IonicErrorHandler },
+diff --git a/src/app/app.template.html b/src/app/app.template.html
+index 50187bf..79de040 100644
+--- a/src/app/app.template.html
++++ b/src/app/app.template.html
+@@ -33,11 +33,11 @@
+ 
+       <ion-list>
+         <ion-list-header>
+-          Tutorial
++          Support
+         </ion-list-header>
+         <button ion-item menuClose (click)="openTutorial()">
+           <ion-icon item-start name="hammer"></ion-icon>
+-          Show Tutorial
++          About
+         </button>
+       </ion-list>
+     </ion-content>
+@@ -77,11 +77,11 @@
+ 
+       <ion-list>
+         <ion-list-header>
+-          Tutorial
++          Support
+         </ion-list-header>
+         <button ion-item menuClose (click)="openTutorial()">
+           <ion-icon item-start name="hammer"></ion-icon>
+-          Show Tutorial
++          About
+         </button>
+       </ion-list>
+ 
+diff --git a/src/pages/support/support.html b/src/pages/AR/ar.html
+similarity index 100%
+rename from src/pages/support/support.html
+rename to src/pages/AR/ar.html
+diff --git a/src/pages/support/support.scss b/src/pages/AR/ar.scss
+similarity index 100%
+rename from src/pages/support/support.scss
+rename to src/pages/AR/ar.scss
+diff --git a/src/pages/support/support.ts b/src/pages/AR/ar.ts
+similarity index 96%
+rename from src/pages/support/support.ts
+rename to src/pages/AR/ar.ts
+index 17c2273..3699950 100644
+--- a/src/pages/support/support.ts
++++ b/src/pages/AR/ar.ts
+@@ -6,9 +6,9 @@ import { AlertController, NavController, ToastController } from 'ionic-angular';
+ 
+ @Component({
+   selector: 'page-user',
+-  templateUrl: 'support.html'
++  templateUrl: 'ar.html'
+ })
+-export class SupportPage {
++export class ARPage {
+ 
+   submitted: boolean = false;
+   supportMessage: string;
+diff --git a/src/pages/about-popover/about-popover.ts b/src/pages/about-popover/about-popover.ts
+index 79fd2b6..7a1b40b 100644
+--- a/src/pages/about-popover/about-popover.ts
++++ b/src/pages/about-popover/about-popover.ts
+@@ -24,7 +24,7 @@ export class PopoverPage {
+   ) { }
+ 
+   support() {
+-    this.app.getRootNav().push('SupportPage');
++    this.app.getRootNav().push('ApplyPage');
+     this.viewCtrl.dismiss();
+   }
+ 
+@@ -32,4 +32,4 @@ export class PopoverPage {
+     window.open(url, '_blank');
+     this.viewCtrl.dismiss();
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/src/pages/about/about.html b/src/pages/about/about.html
+index 28f4671..c1920cc 100644
+--- a/src/pages/about/about.html
++++ b/src/pages/about/about.html
+@@ -17,35 +17,11 @@
+     <img src="assets/img/ionic-logo-white.svg" alt="ionic logo">
+   </div>
+   <div padding class="about-info">
+-    <h4>Ionic Conference</h4>
+-
+-    <ion-list no-lines>
+-      <ion-item>
+-        <ion-icon name="calendar" item-start></ion-icon>
+-        <ion-label>Date</ion-label>
+-        <ion-datetime displayFormat="MMM DD, YYYY" max="2056" [(ngModel)]="conferenceDate"></ion-datetime>
+-      </ion-item>
+-
+-      <ion-item>
+-        <ion-icon name="pin" item-start></ion-icon>
+-        <ion-label>Location</ion-label>
+-        <ion-select>
+-          <ion-option value="madison" selected>Madison, WI</ion-option>
+-          <ion-option value="austin">Austin, TX</ion-option>
+-          <ion-option value="chicago">Chicago, IL</ion-option>
+-          <ion-option value="seattle">Seattle, WA</ion-option>
+-        </ion-select>
+-      </ion-item>
+-    </ion-list>
+-
++    <h4>Smart Offers</h4>
+     <p>
+-      The Ionic Conference is a one-day conference featuring talks from the
+-      Ionic team. It is focused on Ionic applications being built with
+-      Ionic 2. This includes migrating apps from Ionic 1 to Ionic 2,
+-      Angular concepts, Webpack, Sass, and many other technologies used
+-      in Ionic 2. Tickets are completely sold out, and we’re expecting
+-      more than 1000 developers – making this the largest Ionic
+-      conference ever!
++      Smart Offers is an app powered by barclays that provides real time offers based on your location and actions. You can also see special offers for yourself on
++      a wide range of merchants and can also apply for a barclaycard if dont have one. The app is in its initial stage and will soon integrate features like Augmented
++      Reality to further enhance customer experience.
+     </p>
+   </div>
+ </ion-content>
+diff --git a/src/pages/account/account.ts b/src/pages/account/account.ts
+index 3144edd..e474c23 100644
+--- a/src/pages/account/account.ts
++++ b/src/pages/account/account.ts
+@@ -66,6 +66,6 @@ export class AccountPage {
+   }
+ 
+   support() {
+-    this.nav.push('SupportPage');
++    this.nav.push('ApplyPage');
+   }
+ }
+diff --git a/src/pages/schedule-filter/schedule-filter.html b/src/pages/app-filter/app-filter.html
+similarity index 100%
+rename from src/pages/schedule-filter/schedule-filter.html
+rename to src/pages/app-filter/app-filter.html
+diff --git a/src/pages/app-filter/app-filter.scss b/src/pages/app-filter/app-filter.scss
+new file mode 100644
+index 0000000..834862f
+--- /dev/null
++++ b/src/pages/app-filter/app-filter.scss
+@@ -0,0 +1,17 @@
++//
++//.reset-filters {
++//  color: color($colors, danger);
++//}
++//
++//@each $track, $value in auxiliary-categories() {
++//
++//  ion-item[track=#{$track}] .dot {
++//    height: 10px;
++//    display: inline-block;
++//    width: 10px;
++//    background-color: $value;
++//    border-radius: 5px;
++//    margin-right: 10px;
++//  }
++//
++//}
+diff --git a/src/pages/schedule-filter/schedule-filter.ts b/src/pages/app-filter/app-filter.ts
+similarity index 92%
+rename from src/pages/schedule-filter/schedule-filter.ts
+rename to src/pages/app-filter/app-filter.ts
+index c03cd30..f6c4977 100644
+--- a/src/pages/schedule-filter/schedule-filter.ts
++++ b/src/pages/app-filter/app-filter.ts
+@@ -6,10 +6,10 @@ import { ConferenceData } from '../../providers/conference-data';
+ 
+ 
+ @Component({
+-  selector: 'page-schedule-filter',
+-  templateUrl: 'schedule-filter.html'
++  selector: 'page-app-filter',
++  templateUrl: 'app-filter.html'
+ })
+-export class ScheduleFilterPage {
++export class AppFilterPage {
+   tracks: Array<{name: string, isChecked: boolean}> = [];
+ 
+   constructor(
+diff --git a/src/pages/apply/apply.html b/src/pages/apply/apply.html
+new file mode 100644
+index 0000000..91dced3
+--- /dev/null
++++ b/src/pages/apply/apply.html
+@@ -0,0 +1,34 @@
++<ion-header>
++
++	<ion-navbar>
++		<button ion-button menuToggle>
++      <ion-icon name="menu"></ion-icon>
++    </button>
++		<ion-title>Support</ion-title>
++	</ion-navbar>
++
++</ion-header>
++
++
++<ion-content>
++	<div class="logo">
++		<img src="assets/img/appicon.svg" alt="Ionic Logo">
++	</div>
++
++	<form #submitForm="ngForm" novalidate (ngSubmit)="submit(submitForm)">
++		<ion-list no-lines>
++			<ion-item>
++				<ion-label stacked color="primary">Enter your support message below</ion-label>
++				<ion-textarea [(ngModel)]="supportMessage" name="supportQuestion" #supportQuestion="ngModel" rows="6" required></ion-textarea>
++			</ion-item>
++		</ion-list>
++
++		<p ion-text [hidden]="supportQuestion.valid || submitted === false" color="danger" padding-left>
++			Support message is required
++		</p>
++
++		<div padding>
++			<button ion-button block type="submit">Submit</button>
++		</div>
++	</form>
++</ion-content>
+diff --git a/src/pages/apply/apply.scss b/src/pages/apply/apply.scss
+new file mode 100644
+index 0000000..e69de29
+diff --git a/src/pages/apply/apply.ts b/src/pages/apply/apply.ts
+new file mode 100644
+index 0000000..6d32c2a
+--- /dev/null
++++ b/src/pages/apply/apply.ts
+@@ -0,0 +1,66 @@
++import { Component } from '@angular/core';
++import { NgForm } from '@angular/forms';
++
++import { AlertController, NavController, ToastController } from 'ionic-angular';
++
++
++@Component({
++  selector: 'page-user',
++  templateUrl: 'apply.html'
++})
++export class ApplyPage {
++
++  submitted: boolean = false;
++  supportMessage: string;
++
++  constructor(
++    public navCtrl: NavController,
++    public alertCtrl: AlertController,
++    public toastCtrl: ToastController
++  ) {
++
++  }
++
++  ionViewDidEnter() {
++    let toast = this.toastCtrl.create({
++      message: 'This does not actually send a support request.',
++      duration: 3000
++    });
++    toast.present();
++  }
++
++  submit(form: NgForm) {
++    this.submitted = true;
++
++    if (form.valid) {
++      this.supportMessage = '';
++      this.submitted = false;
++
++      let toast = this.toastCtrl.create({
++        message: 'Your support request has been sent.',
++        duration: 3000
++      });
++      toast.present();
++    }
++  }
++
++  // If the user enters text in the support question and then navigates
++  // without submitting first, ask if they meant to leave the page
++  ionViewCanLeave(): boolean | Promise<boolean> {
++    // If the support message is empty we should just navigate
++    if (!this.supportMessage || this.supportMessage.trim().length === 0) {
++      return true;
++    }
++
++    return new Promise((resolve: any, reject: any) => {
++      let alert = this.alertCtrl.create({
++        title: 'Leave this page?',
++        message: 'Are you sure you want to leave this page? Your support message will not be submitted.'
++      });
++      alert.addButton({ text: 'Stay', handler: reject });
++      alert.addButton({ text: 'Leave', role: 'cancel', handler: resolve });
++
++      alert.present();
++    });
++  }
++}
+diff --git a/src/pages/schedule-filter/schedule-filter.scss b/src/pages/schedule-filter/schedule-filter.scss
+deleted file mode 100644
+index 58ed470..0000000
+--- a/src/pages/schedule-filter/schedule-filter.scss
++++ /dev/null
+@@ -1,17 +0,0 @@
+-
+-.reset-filters {
+-  color: color($colors, danger);
+-}
+-
+-@each $track, $value in auxiliary-categories() {
+-
+-  ion-item[track=#{$track}] .dot {
+-    height: 10px;
+-    display: inline-block;
+-    width: 10px;
+-    background-color: $value;
+-    border-radius: 5px;
+-    margin-right: 10px;
+-  }
+-
+-}
+diff --git a/src/pages/schedule/schedule.ts b/src/pages/schedule/schedule.ts
+index d7c7285..29c5536 100644
+--- a/src/pages/schedule/schedule.ts
++++ b/src/pages/schedule/schedule.ts
+@@ -12,7 +12,7 @@ import { ConferenceData } from '../../providers/conference-data';
+ import { UserData } from '../../providers/user-data';
+ 
+ import { SessionDetailPage } from '../session-detail/session-detail';
+-import { ScheduleFilterPage } from '../schedule-filter/schedule-filter';
++import { AppFilterPage } from '../app-filter/app-filter';
+ 
+ 
+ @Component({
+@@ -61,7 +61,7 @@ export class SchedulePage {
+   }
+ 
+   presentFilter() {
+-    let modal = this.modalCtrl.create(ScheduleFilterPage, this.excludeTracks);
++    let modal = this.modalCtrl.create(AppFilterPage, this.excludeTracks);
+     modal.present();
+ 
+     modal.onWillDismiss((data: any[]) => {
+diff --git a/src/pages/tabs-page/tabs-page.html b/src/pages/tabs-page/tabs-page.html
+index 15d08ed..a683a5c 100644
+--- a/src/pages/tabs-page/tabs-page.html
++++ b/src/pages/tabs-page/tabs-page.html
+@@ -1,6 +1,7 @@
+ <ion-tabs [selectedIndex]="mySelectedIndex" name="conference">
+-  <ion-tab [root]="tab1Root" tabTitle="Schedule" tabIcon="calendar" tabUrlPath="conference-schedule"></ion-tab>
+-  <ion-tab [root]="tab2Root" tabTitle="Speakers" tabIcon="contacts"></ion-tab>
++  <ion-tab [root]="tab2Root" tabTitle="Speakers" tabIcon="home"></ion-tab>
+   <ion-tab [root]="tab3Root" tabTitle="Map" tabIcon="map"></ion-tab>
+-  <ion-tab [root]="tab4Root" tabTitle="About" tabIcon="information-circle"></ion-tab>
++  <ion-tab [root]="tab4Root" tabTitle="AR" tabIcon="camera"></ion-tab>
++  <ion-tab [root]="tab1Root" tabTitle="Schedule" tabIcon="calendar" tabUrlPath="conference-schedule"></ion-tab>
++  <ion-tab [root]="tab4Root" tabTitle="Apply" tabIcon="person-add"></ion-tab>
+ </ion-tabs>
+diff --git a/src/pages/tabs-page/tabs-page.ts b/src/pages/tabs-page/tabs-page.ts
+index e5be16f..ee321a3 100644
+--- a/src/pages/tabs-page/tabs-page.ts
++++ b/src/pages/tabs-page/tabs-page.ts
+@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
+ 
+ import { NavParams } from 'ionic-angular';
+ 
+-import { AboutPage } from '../about/about';
+ import { MapPage } from '../map/map';
+ import { SchedulePage } from '../schedule/schedule';
+ import { SpeakerListPage } from '../speaker-list/speaker-list';
++import {ApplyPage} from "../apply/apply";
+ 
+ @Component({
+   templateUrl: 'tabs-page.html'
+@@ -15,7 +15,7 @@ export class TabsPage {
+   tab1Root: any = SchedulePage;
+   tab2Root: any = SpeakerListPage;
+   tab3Root: any = MapPage;
+-  tab4Root: any = AboutPage;
++  tab4Root: any = ApplyPage;
+   mySelectedIndex: number;
+ 
+   constructor(navParams: NavParams) {
+diff --git a/src/pages/tutorial/tutorial.html b/src/pages/tutorial/tutorial.html
+deleted file mode 100644
+index e9b6c27..0000000
+--- a/src/pages/tutorial/tutorial.html
++++ /dev/null
+@@ -1,44 +0,0 @@
+-<ion-header no-border>
+-  <ion-navbar>
+-    <ion-buttons end *ngIf="showSkip">
+-      <button ion-button (click)="startApp()" color="primary">Skip</button>
+-    </ion-buttons>
+-  </ion-navbar>
+-</ion-header>
+-
+-<ion-content no-bounce>
+-  <ion-slides #slides (ionSlideWillChange)="onSlideChangeStart($event)" pager>
+-
+-    <ion-slide>
+-      <img src="assets/img/ica-slidebox-img-1.png" class="slide-image"/>
+-      <h2 class="slide-title">
+-        Welcome to <b>ICA</b>
+-      </h2>
+-      <p>
+-        The <b>ionic conference app</b> is a practical preview of the ionic framework in action, and a demonstration of proper code use.
+-      </p>
+-    </ion-slide>
+-
+-    <ion-slide>
+-      <img src="assets/img/ica-slidebox-img-2.png" class="slide-image"/>
+-      <h2 class="slide-title" >What is Ionic?</h2>
+-      <p><b>Ionic Framework</b> is an open source SDK that enables developers to build high quality mobile apps with web technologies like HTML, CSS, and JavaScript.</p>
+-    </ion-slide>
+-
+-    <ion-slide>
+-      <img src="assets/img/ica-slidebox-img-3.png" class="slide-image"/>
+-      <h2 class="slide-title">What is Ionic Pro?</h2>
+-      <p><b>Ionic Pro</b> is a powerful set of services and features built on top of Ionic Framework that brings a totally new level of app development agility to mobile dev teams.</p>
+-    </ion-slide>
+-
+-    <ion-slide>
+-      <img src="assets/img/ica-slidebox-img-4.png" class="slide-image"/>
+-      <h2 class="slide-title">Ready to Play?</h2>
+-      <button ion-button icon-end large clear (click)="startApp()">
+-        Continue
+-        <ion-icon name="arrow-forward"></ion-icon>
+-      </button>
+-    </ion-slide>
+-
+-  </ion-slides>
+-</ion-content>
+diff --git a/src/pages/tutorial/tutorial.scss b/src/pages/tutorial/tutorial.scss
+deleted file mode 100644
+index 95ae306..0000000
+--- a/src/pages/tutorial/tutorial.scss
++++ /dev/null
+@@ -1,37 +0,0 @@
+-
+-page-tutorial {
+-  .toolbar-background {
+-    background: transparent;
+-    border-color: transparent;
+-  }
+-
+-  .slide-zoom {
+-    height: 100%;
+-  }
+-
+-  .slide-title {
+-    margin-top: 2.8rem;
+-  }
+-
+-  .slide-image {
+-    max-height: 50%;
+-    max-width: 60%;
+-    margin: 36px 0;
+-  }
+-
+-  b {
+-    font-weight: 500;
+-  }
+-
+-  p {
+-    padding: 0 40px;
+-    font-size: 14px;
+-    line-height: 1.5;
+-    color: #60646B;
+-
+-    b {
+-      color: #000000;
+-    }
+-  }
+-
+-}
+diff --git a/src/pages/tutorial/tutorial.ts b/src/pages/tutorial/tutorial.ts
+deleted file mode 100644
+index 84a36f2..0000000
+--- a/src/pages/tutorial/tutorial.ts
++++ /dev/null
+@@ -1,49 +0,0 @@
+-import { Component, ViewChild } from '@angular/core';
+-
+-import { MenuController, NavController, Slides } from 'ionic-angular';
+-
+-import { Storage } from '@ionic/storage';
+-
+-import { TabsPage } from '../tabs-page/tabs-page';
+-
+-@Component({
+-  selector: 'page-tutorial',
+-  templateUrl: 'tutorial.html'
+-})
+-
+-export class TutorialPage {
+-  showSkip = true;
+-
+-	@ViewChild('slides') slides: Slides;
+-
+-  constructor(
+-    public navCtrl: NavController,
+-    public menu: MenuController,
+-    public storage: Storage
+-  ) { }
+-
+-  startApp() {
+-    this.navCtrl.push(TabsPage).then(() => {
+-      this.storage.set('hasSeenTutorial', 'true');
+-    })
+-  }
+-
+-  onSlideChangeStart(slider: Slides) {
+-    this.showSkip = !slider.isEnd();
+-  }
+-
+-  ionViewWillEnter() {
+-    this.slides.update();
+-  }
+-
+-  ionViewDidEnter() {
+-    // the root left menu should be disabled on the tutorial page
+-    this.menu.enable(false);
+-  }
+-
+-  ionViewDidLeave() {
+-    // enable the root left menu when leaving the tutorial page
+-    this.menu.enable(true);
+-  }
+-
+-}
+-- 
+2.15.0.windows.1
+

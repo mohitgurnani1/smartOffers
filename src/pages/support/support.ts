@@ -22,6 +22,7 @@ export class SupportPage {
        this.locationTracker.stopTracking();
      }
 
+     
      ionViewDidEnter() {
   }
 }

@@ -1,0 +1,338 @@
+From e814dc0ae7ca4bf08f502e82df94f268af47ba7d Mon Sep 17 00:00:00 2001
+From: Tejas Jaiswal <tejasjaiswal@yahoo.com>
+Date: Sat, 25 Nov 2017 02:29:13 +0530
+Subject: [PATCH] changed speakers to offers
+
+---
+ src/app/app.module.ts                                  | 10 +++++-----
+ src/assets/data/data.json                              |  2 +-
+ src/pages/home/home.html                               | 18 +++++++++---------
+ src/pages/home/home.scss                               | 10 +++++-----
+ src/pages/home/home.ts                                 | 14 +++++++-------
+ .../offer-detail.html}                                 | 10 +++++-----
+ .../offer-detail.scss}                                 |  4 ++--
+ .../speaker-detail.ts => offer-detail/offer-detail.ts} | 16 ++++++++--------
+ src/pages/session-detail/session-detail.html           |  4 ++--
+ src/providers/conference-data.ts                       | 14 +++++++-------
+ 10 files changed, 51 insertions(+), 51 deletions(-)
+ rename src/pages/{speaker-detail/speaker-detail.html => offer-detail/offer-detail.html} (68%)
+ rename src/pages/{speaker-detail/speaker-detail.scss => offer-detail/offer-detail.scss} (61%)
+ rename src/pages/{speaker-detail/speaker-detail.ts => offer-detail/offer-detail.ts} (64%)
+
+diff --git a/src/app/app.module.ts b/src/app/app.module.ts
+index 280e91b..90a1076 100644
+--- a/src/app/app.module.ts
++++ b/src/app/app.module.ts
+@@ -20,7 +20,7 @@ import { OfferPage } from '../pages/offer/offer';
+ import { AppFilterPage } from '../pages/app-filter/app-filter';
+ import { SessionDetailPage } from '../pages/session-detail/session-detail';
+ import { SignupPage } from '../pages/signup/signup';
+-import { SpeakerDetailPage } from '../pages/speaker-detail/speaker-detail';
++import { OfferDetailPage } from '../pages/offer-detail/offer-detail';
+ import { HomePage } from '../pages/home/home';
+ import { TabsPage } from '../pages/tabs-page/tabs-page';
+ import { ApplyPage } from '../pages/apply/apply';
+@@ -43,7 +43,7 @@ import {TrackingPage} from "../pages/tracking/tracking";
+     AppFilterPage,
+     SessionDetailPage,
+     SignupPage,
+-    SpeakerDetailPage,
++    OfferDetailPage,
+     HomePage,
+     TabsPage,
+     ApplyPage,
+@@ -59,8 +59,8 @@ import {TrackingPage} from "../pages/tracking/tracking";
+         { component: OfferPage, name: 'Offer', segment: 'offer' },
+         { component: SessionDetailPage, name: 'SessionDetail', segment: 'sessionDetail/:sessionId' },
+         { component: AppFilterPage, name: 'ScheduleFilter', segment: 'scheduleFilter' },
+-        { component: HomePage, name: 'SpeakerList', segment: 'speakerList' },
+-        { component: SpeakerDetailPage, name: 'SpeakerDetail', segment: 'speakerDetail/:speakerId' },
++        { component: HomePage, name: 'OfferList', segment: 'offerList' },
++        { component: OfferDetailPage, name: 'OfferDetail', segment: 'offerDetail/:offerId' },
+         { component: MapPage, name: 'Map', segment: 'map' },
+         { component: AboutPage, name: 'About', segment: 'about' },
+         { component: ApplyPage, name: 'ApplyPage', segment: 'apply' },
+@@ -85,7 +85,7 @@ import {TrackingPage} from "../pages/tracking/tracking";
+     AppFilterPage,
+     SessionDetailPage,
+     SignupPage,
+-    SpeakerDetailPage,
++    OfferDetailPage,
+     HomePage,
+     TabsPage,
+     ApplyPage,
+diff --git a/src/assets/data/data.json b/src/assets/data/data.json
+index 7cce23c..fa91440 100644
+--- a/src/assets/data/data.json
++++ b/src/assets/data/data.json
+@@ -207,7 +207,7 @@
+   }],
+ 
+ 
+-  "speakers": [{
++  "offers": [{
+     "name": "Flipkart",
+     "profilePic": "assets/img/speakers/bear.jpg",
+     "twitter": "ionicframework",
+diff --git a/src/pages/home/home.html b/src/pages/home/home.html
+index 1b3959c..2fa84b5 100644
+--- a/src/pages/home/home.html
++++ b/src/pages/home/home.html
+@@ -29,25 +29,25 @@
+   </ion-toolbar>-->
+ </ion-header>
+ 
+-<ion-content class="outer-content speaker-list">
++<ion-content class="outer-content offer-list">
+ 
+-  <ion-list [virtualScroll]="speakers">
++  <ion-list [virtualScroll]="offers">
+     <ion-grid fixed>
+       <ion-row align-items-stretch>
+-        <ion-col col-12 col-md-6 align-self-stretch align-self-center *virtualItem="let speaker" approxItemHeight="457px">
+-          <ion-card class="speaker-card">
++        <ion-col col-12 col-md-6 align-self-stretch align-self-center *virtualItem="let offer" approxItemHeight="457px">
++          <ion-card class="offer-card">
+             <ion-card-header>
+-              <button ion-item detail-none (click)="goToSpeakerDetail(speaker)">
+-                {{speaker.name}}
++              <button ion-item detail-none (click)="goToSpeakerDetail(offer)">
++                {{offer.name}}
+               </button>
+             </ion-card-header>
+             <ion-card-content class="outer-content">
+               <ion-list>
+-                <button ion-item *ngFor="let session of speaker.sessions" (click)="goToSessionDetail(session)">
++                <button ion-item *ngFor="let session of offer.sessions" (click)="goToSessionDetail(session)">
+                   <h3>{{session.name}}</h3>
+                 </button>
+-                <button ion-item (click)="goToSpeakerDetail(speaker)">
+-                  <h3>About {{speaker.name}}</h3>
++                <button ion-item (click)="goToSpeakerDetail(offer)">
++                  <h3>About {{offer.name}}</h3>
+                 </button>
+               </ion-list>
+             </ion-card-content>
+diff --git a/src/pages/home/home.scss b/src/pages/home/home.scss
+index 051ffe3..9c4a616 100644
+--- a/src/pages/home/home.scss
++++ b/src/pages/home/home.scss
+@@ -1,9 +1,9 @@
+-page-speaker-list {
++page-offer-list {
+   .scroll-content {
+     background: #EDEDED;
+   }
+ 
+-  .speaker-card {
++  .offer-card {
+     height: 100%;
+     display: flex;
+     flex-direction: column;
+@@ -15,16 +15,16 @@ page-speaker-list {
+ 
+   // Todo: remove when this issue https://github.com/ionic-team/ionic/issues/11212 is fixed
+   @media(min-width: 769px) {
+-    .speaker-card {
++    .offer-card {
+       height: 370px;
+     }
+   }
+ 
+-  .speaker-card ion-card-header .item {
++  .offer-card ion-card-header .item {
+     padding: 4px 16px;
+   }
+ 
+-  .speaker-card ion-card-content {
++  .offer-card ion-card-content {
+     padding-left: 0;
+     padding-right: 0;
+   }
+diff --git a/src/pages/home/home.ts b/src/pages/home/home.ts
+index 70e191a..5979a28 100644
+--- a/src/pages/home/home.ts
++++ b/src/pages/home/home.ts
+@@ -11,7 +11,7 @@ import { InAppBrowser } from '@ionic-native/in-app-browser';
+ import { ConferenceData } from '../../providers/conference-data';
+ 
+ import { SessionDetailPage } from '../session-detail/session-detail';
+-import { SpeakerDetailPage } from '../speaker-detail/speaker-detail';
++import { OfferDetailPage } from '../offer-detail/offer-detail';
+ import {AppFilterPage} from "../app-filter/app-filter";
+ 
+ // TODO remove
+@@ -24,12 +24,12 @@ export interface ActionSheetButton {
+ };
+ 
+ @Component({
+-  selector: 'page-speaker-list',
++  selector: 'page-offer-list',
+   templateUrl: 'home.html'
+ })
+ export class HomePage {
+   actionSheet: ActionSheet;
+-  speakers: any[] = [];
++  offers: any[] = [];
+   excludeTracks: any = [];
+ 
+   constructor(
+@@ -43,8 +43,8 @@ export class HomePage {
+ 
+   ionViewDidLoad() {
+     //integrate with service
+-    this.confData.getSpeakers().subscribe((speakers: any[]) => {
+-      this.speakers = speakers;
++    this.confData.getOffers().subscribe((offers: any[]) => {
++      this.offers = offers;
+     });
+   }
+   update() {
+@@ -72,7 +72,7 @@ export class HomePage {
+     this.navCtrl.push(SessionDetailPage, { sessionId: session.id });
+   }
+ 
+-  goToSpeakerDetail(speaker: any) {
+-    this.navCtrl.push(SpeakerDetailPage, { speakerId: speaker.id });
++  goToSpeakerDetail(offer: any) {
++    this.navCtrl.push(OfferDetailPage, { offerId: offer.id });
+   }
+ }
+diff --git a/src/pages/speaker-detail/speaker-detail.html b/src/pages/offer-detail/offer-detail.html
+similarity index 68%
+rename from src/pages/speaker-detail/speaker-detail.html
+rename to src/pages/offer-detail/offer-detail.html
+index de3fbed..7bc4141 100644
+--- a/src/pages/speaker-detail/speaker-detail.html
++++ b/src/pages/offer-detail/offer-detail.html
+@@ -1,12 +1,12 @@
+ <ion-header>
+   <ion-navbar>
+-    <ion-title>{{speaker?.name}}</ion-title>
++    <ion-title>{{offer?.name}}</ion-title>
+   </ion-navbar>
+ </ion-header>
+ 
+-<ion-content padding class="speaker-detail">
+-  <div text-center *ngIf="speaker">
+-    <img [src]="speaker.profilePic" [alt]="speaker.name"><br>
++<ion-content padding class="offer-detail">
++  <div text-center *ngIf="offer">
++    <img [src]="offer.profilePic" [alt]="offer.name"><br>
+ 
+     <button ion-button icon-only clear small color="twitter">
+       <ion-icon name="logo-twitter"></ion-icon>
+@@ -19,5 +19,5 @@
+     </button>
+   </div>
+ 
+-  <p>{{speaker?.about}}</p>
++  <p>{{offer?.about}}</p>
+ </ion-content>
+diff --git a/src/pages/speaker-detail/speaker-detail.scss b/src/pages/offer-detail/offer-detail.scss
+similarity index 61%
+rename from src/pages/speaker-detail/speaker-detail.scss
+rename to src/pages/offer-detail/offer-detail.scss
+index cb09475..2c4561b 100644
+--- a/src/pages/speaker-detail/speaker-detail.scss
++++ b/src/pages/offer-detail/offer-detail.scss
+@@ -1,9 +1,9 @@
+ 
+-.speaker-detail img {
++.offer-detail img {
+   max-width: 140px;
+   border-radius: 50%;
+ }
+ 
+-.speaker-detail p {
++.offer-detail p {
+   color: #60646B;
+ }
+diff --git a/src/pages/speaker-detail/speaker-detail.ts b/src/pages/offer-detail/offer-detail.ts
+similarity index 64%
+rename from src/pages/speaker-detail/speaker-detail.ts
+rename to src/pages/offer-detail/offer-detail.ts
+index 050f5f7..3e38de1 100644
+--- a/src/pages/speaker-detail/speaker-detail.ts
++++ b/src/pages/offer-detail/offer-detail.ts
+@@ -4,21 +4,21 @@ import { NavController, NavParams } from 'ionic-angular';
+ import { ConferenceData } from '../../providers/conference-data';
+ 
+ @Component({
+-  selector: 'page-speaker-detail',
+-  templateUrl: 'speaker-detail.html'
++  selector: 'page-offer-detail',
++  templateUrl: 'offer-detail.html'
+ })
+-export class SpeakerDetailPage {
+-  speaker: any;
++export class OfferDetailPage {
++  offer: any;
+ 
+   constructor(public dataProvider: ConferenceData, public navCtrl: NavController, public navParams: NavParams) {
+   }
+ 
+   ionViewWillEnter() {
+     this.dataProvider.load().subscribe((data: any) => {
+-      if (data && data.speakers) {
+-        for (const speaker of data.speakers) {
+-          if (speaker && speaker.id === this.navParams.data.speakerId) {
+-            this.speaker = speaker;
++      if (data && data.offers) {
++        for (const offer of data.offers) {
++          if (offer && offer.id === this.navParams.data.offerId) {
++            this.offer = offer;
+             break;
+           }
+         }
+diff --git a/src/pages/session-detail/session-detail.html b/src/pages/session-detail/session-detail.html
+index f6c90e1..919fe06 100644
+--- a/src/pages/session-detail/session-detail.html
++++ b/src/pages/session-detail/session-detail.html
+@@ -7,8 +7,8 @@
+ <ion-content padding>
+   <div *ngIf="session">
+     <h1>{{session.name}}</h1>
+-    <h4 *ngFor="let speaker of session?.speakers">
+-    {{speaker.name}}
++    <h4 *ngFor="let offer of session?.offers">
++    {{offer.name}}
+   </h4>
+     <p>
+       {{session.timeStart}} - {{session.timeEnd}}
+diff --git a/src/providers/conference-data.ts b/src/providers/conference-data.ts
+index 069e231..97354d9 100644
+--- a/src/providers/conference-data.ts
++++ b/src/providers/conference-data.ts
+@@ -40,11 +40,11 @@ export class ConferenceData {
+           session.speakers = [];
+           if (session.speakerNames) {
+             session.speakerNames.forEach((speakerName: any) => {
+-              let speaker = this.data.speakers.find((s: any) => s.name === speakerName);
+-              if (speaker) {
+-                session.speakers.push(speaker);
+-                speaker.sessions = speaker.sessions || [];
+-                speaker.sessions.push(session);
++              let offer = this.data.offers.find((s: any) => s.name === speakerName);
++              if (offer) {
++                session.offers.push(offer);
++                offer.sessions = offer.sessions || [];
++                offer.sessions.push(session);
+               }
+             });
+           }
+@@ -130,9 +130,9 @@ export class ConferenceData {
+     session.hide = !(matchesQueryText && matchesTracks && matchesSegment);
+   }
+ 
+-  getSpeakers() {
++  getOffers() {
+     return this.load().map((data: any) => {
+-      return data.speakers.sort((a: any, b: any) => {
++      return data.offers.sort((a: any, b: any) => {
+         let aName = a.name.split(' ').pop();
+         let bName = b.name.split(' ').pop();
+         return aName.localeCompare(bName);
+-- 
+2.15.0.windows.1
+

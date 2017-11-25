@@ -12,7 +12,8 @@ export class RestapiServiceProvider {
 
   data: any;
 
-  apiUrl = 'http://192.168.43.184:8080/mohit/';
+  apiUrl = 'http://192.168.43.86:8090/transaction/deviceTokenId/';
+  //apiUrl = 'http://192.168.43.184:8080/mohit/';
   
   constructor(public http: Http) {
     console.log('Hello RestapiServiceProvider Provider');
@@ -20,8 +21,9 @@ export class RestapiServiceProvider {
 
   postData(a : number, b: number, c: any) {
     return new Promise(resolve => {
-      this.http.get(this.apiUrl+a+'/'+b+'/'+c)
-        .subscribe(data => {
+      this.http.get(this.apiUrl+c+/latitude/+a+'/longitude/'+b+'/send')
+      //this.http.get(this.apiUrl+a+'/'+b+'/'+c)
+      .subscribe(data => {
           this.data = data;
           resolve(this.data);
         });

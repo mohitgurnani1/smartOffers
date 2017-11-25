@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 
-import { Events, MenuController, Nav, Platform } from 'ionic-angular';
+import { Events, MenuController, Nav, Platform , AlertController} from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { Storage } from '@ionic/storage';
@@ -18,6 +18,11 @@ import { SupportPage } from '../pages/support/support';
 
 import { ConferenceData } from '../providers/conference-data';
 import { UserData } from '../providers/user-data';
+import { LocationTracker } from '../providers/location-tracker';
+import {Push, PushObject, PushOptions  } from '@ionic-native/push';
+import { PushNotificationPage } from '../pages/push-notification/push-notification';
+
+
 
 export interface PageInterface {
   title: string;
@@ -38,6 +43,8 @@ export class ConferenceApp {
   // @ViewChild(Nav) gets a reference to the app's root nav
   @ViewChild(Nav) nav: Nav;
 
+  public deviceToken : any;
+  
   // List of pages that can be navigated to from the left menu
   // the left menu only works after login
   // the login page disables the left menu
@@ -66,8 +73,10 @@ export class ConferenceApp {
     public platform: Platform,
     public confData: ConferenceData,
     public storage: Storage,
-    public splashScreen: SplashScreen
-  ) {
+    public splashScreen: SplashScreen,
+    public locationTracker : LocationTracker,
+    public push:Push,
+    public alertc:AlertController) {
 
     // Check if the user has already seen the tutorial
     this.storage.get('hasSeenTutorial')
@@ -147,9 +156,83 @@ export class ConferenceApp {
     // Call any initial plugins when ready
     this.platform.ready().then(() => {
       this.splashScreen.hide();
-      
+      //this.initPushNotification();
+      //this.locationTracker.deviceToken = this.deviceToken;
     });
+    this.locationTracker.startTracking();
+    
   }
+
+
+  initPushNotification() {
+    if (!this.platform.is('cordova')) {
+      console.warn('Push notifications not initialized. Cordova is not available - Run in physical device');
+      return;
+    }
+    const options: PushOptions = {
+      android: {},
+     ios: {
+         alert: 'true',
+         badge: true,
+         sound: 'false'
+     },
+     windows: {},
+  };
+  
+  const pushObject: PushObject = this.push.init(options);
+  
+  pushObject.on('notification').subscribe((data: any) => {
+    console.log('message -> ' + data.message);
+    //if user using app and push notification comes
+    if (data.additionalData.foreground) {
+      // if application open, show popup
+      let confirmAlert = this.alertc.create({
+        title: 'New Notification',
+        message: data.message,
+        buttons: [{
+          text: 'Ignore',
+          role: 'cancel'
+        }, {
+          text: 'View',
+          handler: () => {
+            //TODO: Your logic here
+            this.nav.push(PushNotificationPage, { message: data.message });
+          }
+        }]
+      });
+      confirmAlert.present();
+    } else if (data.additionalData.background) {
+
+      this.alertc.create({
+        title: 'debug',
+        message: 'debug '}).present();
+      //if user NOT using app and push notification comes
+      //TODO: Your logic on click of push notification directly
+      this.nav.push(PushNotificationPage, { message: data.message });
+      console.log('Push notification clicked');
+    }
+  });
+
+  // pushObject.on('notification').subscribe((notification: any) => {
+  //   if(notification.additionalData.foreground){
+  //     let yourAlert =this.alertc.create({
+  //     title:'New Push Notification',
+  //     message:notification.message
+  
+  // });
+  // yourAlert.present();
+  // }
+  // });
+  
+  pushObject.on('registration').subscribe((registration: any) => {
+  console.log('Device registered'+ registration.registrationId);
+  this.deviceToken = registration.registrationId;
+});
+  
+  pushObject.on('error').subscribe(error => console.error('Error with Push plugin', error));
+  }
+
+
 
   isActive(page: PageInterface) {
     let childNav = this.nav.getActiveChildNavs()[0];
